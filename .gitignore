@@ -102,3 +102,4 @@ b*_*
 *.png
 *.dat
 *.xlsx
+.idea/
