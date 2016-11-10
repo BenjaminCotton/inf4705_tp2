@@ -14,7 +14,7 @@ les fonction de chronométrage.
 Les scripts pour amasser les données se trouvent dans le répertoire
 script.  Pour lancer l'expérience, il faut rouler
 
- $ ./script/run_data.sh ./tp1-H10-donnees/
+ $ ./script/run_data.sh ./datas/
 
 Les résultats apparaissent alors dans le répertoire results.
 

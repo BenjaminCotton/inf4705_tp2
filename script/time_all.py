@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(
     description="Gather data for the lab")
 parser.add_argument("--data_dir", "-d", required=True,
                     help="the directory containing the datasets")
-parser.add_argument("--results_dir", "-r", default="results",
+parser.add_argument("--results_dir", "-r", default="../results/",
                     help="the directory containing the results")
 parser.add_argument("--amortize", "-m", type=int, default=1,
                     metavar="N",
@@ -28,12 +28,11 @@ parser.add_argument("--amortize", "-m", type=int, default=1,
 def main():
     args = parser.parse_args()
 
-    if not (os.path.isdir(args.data_dir) and
-            os.path.isdir(args.results_dir)):
+    if not (os.path.isdir(args.data_dir)):
         parser.print_usage()
         exit(1)
     
-    sizes = [100, 500, 1000, 5000, 10000, 50000]#, 100000, 500000]
+    sizes = [100, 500, 1000, 5000, 10000, 50000, 100000, 500000]
     set = range(0,10)
 
     for algorithm in algorithms:

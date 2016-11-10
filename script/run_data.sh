@@ -2,7 +2,7 @@
 
 SCRIPTS=./script
 RES=./results
-AMORT=10
+AMORT=1
 DATA=$1
 
 $SCRIPTS/save_hardware.sh $RES/hardware.txt
