@@ -9,12 +9,9 @@ M4SOURCE=rapport.m4
 SOURCE=rapport.tex
 BIBFILE=$(SOURCE:%.tex=%.bib)
 
-.PHONY: all test clean dist
+.PHONY: all clean dist
 
-all: test $(SOURCE:%.tex=%.pdf)
-
-test:
-	python3 -m unittest -v
+all: $(SOURCE:%.tex=%.pdf)
 
 ${SOURCE} : ${M4SOURCE}
 	m4 ${@:%.tex=%.m4} > $@
@@ -34,5 +31,5 @@ clean:
 	-rm *.eps *converted-to.pdf *.gnuplot *gnuplottex*
 
 dist: all
-	zip ${ZIPNAME} algorithms/*.py script/*.{py,sh} tests/*.py results/*.dat
+	zip ${ZIPNAME} algorithms/*.py script/*.{py,sh} results/*.dat
 	zip ${ZIPNAME} Makefile README.md rapport.{m4,bib,pdf} tp.sh
