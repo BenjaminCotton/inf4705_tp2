@@ -12,8 +12,8 @@ from algorithms.timing import time_algo
 
 algorithms = [
     (Vorace(), 10),
-    (Progdyn(), None),
-    (Tabou(), None),
+    (Progdyn(), 1),
+    (Tabou(), 1),
 ]
 
 algomap = OrderedDict((a.get_name(), (a, m)) for a, m in algorithms)
@@ -42,7 +42,7 @@ def main():
     args = parser.parse_args()
 
     algo, def_amort = algomap[args.algorithm]
-    if not args.amortize:
+    if args.amortize==1:
         args.amortize = def_amort
     with args.ex_path as f:
         n = int(f.readline())

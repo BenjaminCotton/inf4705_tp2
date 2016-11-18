@@ -11,8 +11,8 @@ from algorithms.timing import time_algo
 
 algorithms = [
     (Vorace(), 10),
-    (Progdyn(), None),
-    (Tabou(), None),
+    (Progdyn(), 1),
+    (Tabou(), 1),
 ]
 
 parser = argparse.ArgumentParser(
