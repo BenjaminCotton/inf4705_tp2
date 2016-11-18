@@ -3,15 +3,16 @@
 import argparse, os
 
 from context import algorithms
+from algorithms.algorithm import Block
 from algorithms.vorace import Vorace
 from algorithms.progdyn import Progdyn
 from algorithms.tabou import Tabou
 from algorithms.timing import time_algo
 
 algorithms = [
-    Vorace(),
-    Progdyn(),
-    Tabou(),
+    (Vorace(), 10),
+    (Progdyn(), None),
+    (Tabou(), None),
 ]
 
 parser = argparse.ArgumentParser(
@@ -20,10 +21,6 @@ parser.add_argument("--data_dir", "-d", required=True,
                     help="the directory containing the datasets")
 parser.add_argument("--results_dir", "-r", default="../results/",
                     help="the directory containing the results")
-parser.add_argument("--amortize", "-m", type=int, default=1,
-                    metavar="N",
-                    help="amortize the timing overhead over N" \
-                    " executions")
 
 def main():
     args = parser.parse_args()
@@ -35,7 +32,7 @@ def main():
     sizes = [100, 500, 1000, 5000, 10000, 50000, 100000, 500000]
     set = range(0,10)
 
-    for algorithm in algorithms:
+    for algorithm, amort in algorithms:
         result_name = "{}.dat".format(algorithm.get_name())
         result_name = os.path.join(args.results_dir, result_name)
         result = open(result_name, 'w')
@@ -44,28 +41,17 @@ def main():
         for size in sizes :
             result.write(str(size) + "\t")
             total = 0
-            for series in set :
+            for series in set:
                 data_name = "b{}_{}".format(size, series)
                 data_name = os.path.join(args.data_dir, data_name)
                 print("Reading {}".format(data_name))
                 with open(data_name, 'r') as testset:
-                    nbBlocs = int(testset.readline())
-                    items = []
-                    for x in range(nbBlocs):
-                        dimensions = testset.readline().split()
-                        dimensions = [int(i) for i in dimensions]
-                        items.append(
-                            [dimensions[0], min(dimensions[1], dimensions[2]), max(dimensions[1], dimensions[2])])
-                        items.append(
-                            [dimensions[1], min(dimensions[0], dimensions[2]), max(dimensions[0], dimensions[2])])
-                        items.append(
-                            [dimensions[2], min(dimensions[0], dimensions[1]), max(dimensions[0], dimensions[1])])
-                if algorithm.get_name() == "vorace" :
-                    timed, _ = time_algo(algorithm, items,
-                                         args.amortize*10)
-                else :
-                    timed, _ = time_algo(algorithm, items,
-                                        args.amortize)
+                    n = int(testset.readline())
+                    blocks = []
+                    for _ in range(n) :
+                        dims = map(int, testset.readline().split())
+                        blocks.extend(Block.generate(*dims))
+                timed, _ = time_algo(algorithm, (blocks,), amort)
                 total += timed
             average = total / len(set)
             result.write("%.6f\t" % average)
