@@ -16,9 +16,8 @@ all: $(SOURCE:%.tex=%.pdf)
 ${SOURCE} : ${M4SOURCE}
 	m4 ${@:%.tex=%.m4} > $@
 
-$(SOURCE:%.tex=%.pdf) : ${SOURCE} ${BIBFILE}
+$(SOURCE:%.tex=%.pdf) : ${SOURCE}
 	pdflatex --shell-escape $(@:%.pdf=%.tex)
-	bibtex $(@:%.pdf=%.aux)
 	pdflatex --shell-escape $(@:%.pdf=%.tex)
 	pdflatex --shell-escape $(@:%.pdf=%.tex)
 
@@ -32,4 +31,4 @@ clean:
 
 dist: all
 	zip ${ZIPNAME} algorithms/*.py script/*.{py,sh} results/*.dat
-	zip ${ZIPNAME} Makefile README.md rapport.{m4,bib,pdf} tp.sh
+	zip ${ZIPNAME} Makefile README.md rapport.{m4,pdf} tp.sh
