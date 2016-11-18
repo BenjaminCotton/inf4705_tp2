@@ -4,18 +4,19 @@ import argparse
 from collections import OrderedDict
 
 from context import algorithms
+from algorithms.algorithm import *
 from algorithms.vorace import Vorace
 from algorithms.progdyn import Progdyn
 from algorithms.tabou import Tabou
 from algorithms.timing import time_algo
 
 algorithms = [
-    Vorace(),
-    Progdyn(),
-    Tabou(),
+    (Vorace(), 10),
+    (Progdyn(), None),
+    (Tabou(), None),
 ]
 
-algomap = OrderedDict((a.get_name(), a) for a in algorithms)
+algomap = OrderedDict((a.get_name(), (a, m)) for a, m in algorithms)
 
 parser = argparse.ArgumentParser(
     description="Start and time choosing algorithms for the lab")
@@ -26,6 +27,10 @@ parser.add_argument("--ex_path", "-e", type=argparse.FileType('r'),
                     help="the file containing the blocs to place in the tower")
 parser.add_argument("--print", "-p", action='store_true',
                     help="print the blocs used in the tower")
+parser.add_argument("--height", "-H", action='store_true',
+                    help="print the height of the tower")
+parser.add_argument("--check", "-c", action='store_true',
+                    help="check to verify that the tower is balanced")
 parser.add_argument("--time", "-t", action='store_true',
                     help="show the mean time of execution")
 parser.add_argument("--amortize", "-m", type=int, default=1,
@@ -36,29 +41,31 @@ parser.add_argument("--amortize", "-m", type=int, default=1,
 def main():
     args = parser.parse_args()
 
-    algo = algomap[args.algorithm]
+    algo, def_amort = algomap[args.algorithm]
+    if not args.amortize:
+        args.amortize = def_amort
     with args.ex_path as f:
-        nbBlocs = int(f.readline())
-        items = []
-        # For every dimensions, add the 3 possibles blocs in the items list.
-        # item[0] = height
-        # item[1] = width (smallest dimension between the 2 left)
-        # item[2] = depth (biggest dimension of the 2 left)
-        for x in range(nbBlocs) :
-            dimensions = f.readline().split()
-            dimensions = [int(i) for i in dimensions]
-            items.append([dimensions[0], min(dimensions[1],dimensions[2]), max(dimensions[1],dimensions[2])])
-            items.append([dimensions[1], min(dimensions[0],dimensions[2]), max(dimensions[0],dimensions[2])])
-            items.append([dimensions[2], min(dimensions[0],dimensions[1]), max(dimensions[0],dimensions[1])])
+        n = int(f.readline())
+        blocks = []
+        for _ in range(n) :
+            dims = map(int, f.readline().split())
+            blocks.extend(Block.generate(*dims))
 
-    average, blocsUsed = time_algo(algo, items, args.amortize)
+    average, (size, blocks) = time_algo(algo, (blocks,), args.amortize)
 
     if args.time:
         print("Mean time: {} seconds".format(average))
 
-    if args.print:
-        for bloc in blocsUsed :
-            print(items[bloc])
+    if args.height:
+        print("Height: {}".format(size))
+
+    if args.print or args.check:
+        top = None
+        for b in blocks :
+            if args.check and not b.fits_on(top):
+                print("ERROR: Tower is not balanced")
+            if args.print: print(b)
+            top = b
 
 if __name__ == "__main__":
     main()
